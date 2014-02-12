@@ -1,0 +1,115 @@
+REQUISITOS:
+	- Gerenciar criação, deleção, manutenção, autenticação de repositórios.
+	- Usar o puppetlabs/apache como dependência para prover acesso via internet.
+	- Gerenciar agendamento de backups(crontab):
+		- em .tar.(gz|bz2) numa pasta qualquer
+		- por ftp
+		- por rsync/ssh/sftp
+		- no S3
+	- Gerenciar o carregamento de backups em repositórios existentes.
+	- Gerenciar SVN-Hooks para cada repositório.
+	- Criar automaticamente o VirtualHost do Apache tendo como padrão [svn].[empresa.com.br]/repo/[repositório]
+	- Usar autenticação do apache em texto plano
+	- Suporte a SSL: http://www.wandisco.com/svnforum/threads/31330-Using-SVN-with-SSL
+
+ESTRUTURA DE DIRETÓRIOS:
+	[svn-path]
+		/ssl
+			/certificate.crt
+			/private.key
+		/repositiries
+			/[repo-1]
+			/[repo-2]
+			/[repo-3]
+		/backups
+			/[repo-1]
+				/[repo-1]_2014-02-12.tar.bz2
+				/[repo-1]_2014-02-13.tar.bz2
+			/[repo-2]
+				/[repo-2]_2014-02-12.tar.gz
+				/[repo-2]_2014-02-13.tar.gz
+			/[repo-3]
+				/[repo-3]_2014-02-12.zip
+				/[repo-3]_2014-02-13.zip
+		/auth
+			/general.auth
+			/[repo-1].auth
+			/[repo-2].auth
+			/[repo-3].auth
+		/restore
+			/[repo-1]_2014-02-13.tar.bz2
+			/[repo-3]_2014-02-12.zip
+
+EXEMPLOS:
+
+class {'svn':
+	ensure             => present,
+	servername         => 'svn.empresa.com.br',
+	serveralias        => [
+		'fontes.empresa.com.br',
+		'subversion.empresa.com.br',
+	],
+	serversuffix       => 'repo',
+	ssl_certificate    => 'certificate.crt',
+	ssl_privateKey     => 'private.key',
+	authorization_file => 'general.auth',
+	svn_path           => '/var/lib/svn',
+}
+
+svn::repo {'telesena':
+	ensure            => present,
+	AuthorizationFile => 'telesena.auth',
+}
+
+svn::repo {'scripts':
+	ensure            => present,
+	AuthorizationFile => 'general.auth',
+}
+
+svn::repo {'database':
+	ensure            => present,
+	AuthorizationFile => 'db.auth',
+}
+
+svn::user {'fvillaca':
+	ensure       => present,
+	password     => 'telesena',
+	repositories => ['database','scripts','telesena'],
+}
+
+svn::user {'lthibes':
+	ensure       => present,
+	password     => '123qwe',
+	repositories => '*',
+}
+
+svn::backup::s3 {'telesena':
+	bucket           => 'svn-backups/telesena',
+	compression      => 'bz2',
+	recurrence_hour  => '4',
+	local_retention  => '2',
+	remote_retention => '30',
+}
+
+svn::backup::ftp {'database':
+	hostname         => 'ftp.bau.com.br',
+	username         => 'lidercap_bkp',
+	password         => 'senha-para-backup-do-svn',
+	location         => '/backups/svn',
+	compression      => 'gz',
+	recurrence_hour  => '12',
+	local_retention  => '2',
+	remote_retention => '30',
+}
+
+svn::backup::sftp {'scripts':
+	hostname          => '10.100.0.206',
+	username          => 'backupuser',
+	password          => 'senha-para-backup-do-svn',
+	location          => '/home/svn/bkps',
+	compression       => 'zip',
+	recurrence_minute => '30',
+	local_retention   => '2',
+	remote_retention  => '30',
+}
+
