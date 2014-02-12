@@ -57,18 +57,18 @@ class {'svn':
 }
 
 svn::repo {'telesena':
-	ensure            => present,
-	AuthorizationFile => 'telesena.auth',
+	ensure             => present,
+	authorization_file => 'telesena.auth',
 }
 
 svn::repo {'scripts':
-	ensure            => present,
-	AuthorizationFile => 'general.auth',
+	ensure             => present,
+	authorization_file => 'general.auth',
 }
 
 svn::repo {'database':
-	ensure            => present,
-	AuthorizationFile => 'db.auth',
+	ensure             => present,
+	authorization_file => 'db.auth',
 }
 
 svn::user {'fvillaca':
@@ -84,6 +84,8 @@ svn::user {'lthibes':
 }
 
 svn::backup::s3 {'telesena':
+	aws_access_key   => 'aws_access_key,
+    aws_secret_key   => 'aws_secret_key',
 	bucket           => 'svn-backups/telesena',
 	compression      => 'bz2',
 	recurrence_hour  => '4',
