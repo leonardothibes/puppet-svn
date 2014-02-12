@@ -58,6 +58,8 @@ class {'svn':
 
 svn::repo {'telesena':
 	ensure             => present,
+	anon_access        => read,
+	auth_access        => write,
 	authorization_file => 'telesena.auth',
 }
 
