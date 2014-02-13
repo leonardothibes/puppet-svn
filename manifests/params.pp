@@ -1,4 +1,4 @@
-class params
+class svn::params
 {
 
 }

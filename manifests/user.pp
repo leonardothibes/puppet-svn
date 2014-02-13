@@ -1,4 +1,4 @@
-class user
+class svn::user
 {
 
 }

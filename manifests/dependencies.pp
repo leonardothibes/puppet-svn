@@ -1,4 +1,4 @@
-class dependencies
+class svn::dependencies
 {
 
 }
