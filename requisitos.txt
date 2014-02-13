@@ -43,34 +43,34 @@ ESTRUTURA DE DIRETÓRIOS:
 EXEMPLOS:
 
 class {'svn':
-	ensure             => present,
-	servername         => 'svn.empresa.com.br',
-	serveralias        => [
+	ensure          => present,
+	servername      => 'svn.empresa.com.br',
+	serveralias     => [
 		'fontes.empresa.com.br',
 		'subversion.empresa.com.br',
 	],
-	serversuffix       => 'repo',
-	ssl_certificate    => 'certificate.crt',
-	ssl_privateKey     => 'private.key',
-	authorization_file => 'general.auth',
-	svn_path           => '/var/lib/svn',
+	serversuffix    => 'repo',
+	ssl_certificate => 'certificate.crt',
+	ssl_privateKey  => 'private.key',
+	auth_file       => 'general.auth',
+	svn_path        => '/var/lib/svn',
 }
 
 svn::repo {'telesena':
-	ensure             => present,
-	anon_access        => read,
-	auth_access        => write,
-	authorization_file => 'telesena.auth',
+	ensure      => present,
+	anon_access => read,
+	auth_access => write,
+	auth_file   => 'telesena.auth',
 }
 
 svn::repo {'scripts':
-	ensure             => present,
-	authorization_file => 'general.auth',
+	ensure    => present,
+	auth_file => 'general.auth',
 }
 
 svn::repo {'database':
-	ensure             => present,
-	authorization_file => 'db.auth',
+	ensure    => present,
+	auth_file => 'db.auth',
 }
 
 svn::user {'fvillaca':
